@@ -8,7 +8,6 @@
 #include <cstdint>
 #include <iostream>
 #include <iomanip>
-#include <utest.h>
 
 typedef uint8_t byte_t;
 typedef uint64_t index_t;

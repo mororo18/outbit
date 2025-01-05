@@ -1,5 +1,5 @@
-#include <utest.h>
-#include "../Encoder.hpp"
+#include "utest.h"
+#include "Encoder.hpp"
 
 UTEST(Test, Main) {
     ASSERT_TRUE(true);
