@@ -1,10 +1,11 @@
-CXXFLAGS = -Wall -Wextra -pedantic
+CXXFLAGS = -Wall -Wextra -pedantic -std=c++2b
 OBJ = Encoder.o
-SRC = Encoder.cpp
 TEST_DIR = test/
 
-$(OBJ): $(SRC) Encoder.hpp
-	$(CXX) $(CXXFLAGS) -c $(SRC) -o $(OBJ)
+$(OBJ): Encoder.hpp
+	$(CXX) $(CXXFLAGS) -c $< -o $(OBJ)
+
+all: $(OBJ) test
 
 test:
 	make -C $(TEST_DIR)

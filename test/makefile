@@ -1,15 +1,12 @@
-CXXFLAGS = -Wall -Wextra -pedantic -I ../external/utest.h -I ../
+CXXFLAGS = -Wall -Wextra -pedantic -std=c++2b -I ../external/utest.h -I ../
+HXX = ../Encoder.hpp
 TARGET = run.out
-OBJ = ../Encoder.o
 
-test: $(TARGET)
+test: $(TARGET) 
 	./$(TARGET)
 
-$(TARGET): $(OBJ)
-	$(CXX) main.cpp $< -o $@ $(CXXFLAGS)
-
-$(OBJ):
-	make -C ../
+$(TARGET): main.cpp  $(HXX)
+	$(CXX) $< -o $@ $(CXXFLAGS)
 
 clean:
 	$(RM) $(TARGET)
