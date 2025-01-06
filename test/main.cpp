@@ -9,6 +9,51 @@ UTEST(Test, Main) {
 }
 
 
+UTEST(Encoder, push_bits) {
+    typedef struct bytes {
+        u8 a;
+        u8 b;
+        u8 c;
+    } Bytes;
+
+    Bytes bytes = { 255, 255, 255 };
+
+    auto enc = Encoder();
+    enc.push_bits(bytes, 8);
+    ASSERT_EQ(enc.tail_byte().value(), 255);
+
+    enc.push_bits(bytes, 9);
+    ASSERT_EQ(enc.tail_byte().value(), 1);
+
+    enc.push_bits(bytes, 9);
+    ASSERT_EQ(enc.tail_byte().value(), 3);
+
+    enc.push_bits(bytes, 8);
+    ASSERT_EQ(enc.tail_byte().value(), 3);
+
+    enc.push_bits(0b111111, 6);
+    ASSERT_EQ(enc.tail_byte().value(), 255);
+
+
+    /*
+    std::println("buffer size {}", enc.buffer().size());
+    std::println("buffer as bits:");
+    for (auto byte: enc.buffer()) {
+        std::println("{}", std::bitset<8>{byte}.to_string());
+    }
+    */
+}
+
+UTEST(Encoder, const_buffer) {
+    auto enc = Encoder();
+    auto size_before = enc.buffer().size();
+    auto buffer = enc.buffer();
+    buffer.push_back(1);
+    auto size_after = enc.buffer().size();
+
+    ASSERT_EQ(size_before, size_after);
+}
+
 UTEST(Encoder, serialize_bytes) {
     typedef struct bytes {
         u8 a;

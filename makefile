@@ -2,7 +2,7 @@ CXXFLAGS = -Wall -Wextra -pedantic -std=c++2b
 OBJ = Encoder.o
 TEST_DIR = test/
 
-$(OBJ): Encoder.hpp
+$(OBJ): Encoder.cpp
 	$(CXX) $(CXXFLAGS) -c $< -o $(OBJ)
 
 all: $(OBJ) test

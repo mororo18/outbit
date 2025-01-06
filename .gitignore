@@ -33,4 +33,4 @@
 
 # clangd
 .cache/
-compiler_commands.json
+compile_commands.json
