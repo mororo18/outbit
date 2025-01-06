@@ -4,6 +4,13 @@
 
 using namespace outbit;
 
+/*
+UTEST(Encoder, roundtrip) {
+    auto enc = Encoder();
+    enc.write_as_file("eita");
+}
+*/
+
 UTEST(Encoder, push) {
     typedef struct bytes {
         u8 a;

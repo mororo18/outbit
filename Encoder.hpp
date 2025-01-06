@@ -1,5 +1,4 @@
-#ifndef __ENCODER_HPP_
-#define __ENCODER_HPP_
+#pragma once
 
 #include <cstdint>
 #include <cassert>
@@ -8,22 +7,26 @@
 #include <ranges>
 #include <print>
 #include <optional>
+#include <filesystem>
 
 namespace outbit {
+    namespace fs = std::filesystem;
+
     typedef uint8_t u8;
     typedef int8_t s8;
     class Encoder {
         public:
             Encoder();
 
+            void write_as_file(const fs::path&);
             template<typename T> static
-            std::vector<u8> serialize(const T &item);
+            std::vector<u8> serialize(const T&);
 
             template<typename T>
-            void push(const T &item);
+            void push(const T&);
 
             template<typename T>
-            void push_bits(const T &item, std::size_t n_bits);
+            void push_bits(const T&, std::size_t);
             inline std::optional<u8> tail_byte() const;
             inline const std::vector<u8>& buffer();
         private:
@@ -128,5 +131,3 @@ namespace outbit {
                 output.begin(), output.begin() + output_valid_bytes_lenght);
     }
 }
-
-#endif
