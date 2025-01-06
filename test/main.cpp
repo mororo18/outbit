@@ -4,10 +4,25 @@
 
 using namespace outbit;
 
-UTEST(Test, Main) {
-    ASSERT_TRUE(true);
-}
+UTEST(Encoder, push) {
+    typedef struct bytes {
+        u8 a;
+        u8 b;
+        u8 c;
+    } Bytes;
 
+    Bytes bytes = { 255, 255, 255 };
+
+    auto enc = Encoder();
+    enc.push_bits(bytes, 10);
+    ASSERT_EQ(enc.tail_byte().value(), 3);
+
+    auto before_push = enc.buffer().size();
+    enc.push(bytes);
+    auto after_push = enc.buffer().size();
+    ASSERT_EQ(enc.tail_byte().value(), 3);
+    ASSERT_EQ(before_push + sizeof(bytes), after_push);
+}
 
 UTEST(Encoder, push_bits) {
     typedef struct bytes {

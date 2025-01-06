@@ -55,10 +55,7 @@ namespace outbit {
 
     template<typename T>
     void Encoder::push(const T &item) {
-        // FIXME: consider the tail byte used bits;
-
-        auto serialized = Encoder::serialize(item);
-        m_buffer.insert(m_buffer.end(), serialized.begin(), serialized.end());
+        this->push_bits(item, sizeof(T) * 8);
     }
 
     template<typename T>
