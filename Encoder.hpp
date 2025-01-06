@@ -63,12 +63,12 @@ namespace outbit {
         const std::size_t item_bits_lenght = sizeof(T) * 8;
         assert(n_bits <= item_bits_lenght);
         
-        // We add 8 bits to have the option of do a right bit shift
+        // We add 8 bits to be able to do a right bit shift
         // and place the tail byte used bits at the beggining of the
-        // bitset.
+        // bitset if necessary.
         auto item_bits = std::bitset<item_bits_lenght + 8>{};
 
-        // fill bitset
+        // Fill 'item_bits'
         auto serialized = Encoder::serialize(item);
         for (auto [byte_index, byte] : std::views::enumerate(serialized)) {
              auto byte_bits = std::bitset<8>{byte};
@@ -78,7 +78,6 @@ namespace outbit {
                 item_bits[byte_index * 8 + bit_index] = byte_bits.test(bit_index);
             }
         }
-        assert(m_used_length_of_tail_byte <= 8);
 
         std::size_t output_valid_bits_lenght;
         if (m_used_length_of_tail_byte > 0 && m_used_length_of_tail_byte < 8) {
@@ -115,6 +114,7 @@ namespace outbit {
             m_used_length_of_tail_byte = 8;
         }
 
+        assert(m_used_length_of_tail_byte <= 8);
         assert(output_valid_bytes_lenght <= output.size());
 
         /*
@@ -126,7 +126,6 @@ namespace outbit {
 
         m_buffer.insert(m_buffer.end(),
                 output.begin(), output.begin() + output_valid_bytes_lenght);
-
     }
 }
 
