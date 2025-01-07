@@ -1,4 +1,4 @@
-CXXFLAGS = -Wall -Wextra -pedantic -std=c++2b -I ../external/utest.h -I ../
+CXXFLAGS = -Wall -Wextra -pedantic -std=c++2b -I ../external/utest.h -I ../ -g
 HXX = ../Encoder.hpp
 OBJ = ../Encoder.o
 INC_SRC = ../Encoder.cpp
