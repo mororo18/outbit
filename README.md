@@ -1,5 +1,7 @@
 # outbit
 
+A simple library for handling arbitrary bit lengths, ideal for custom encoding and compression.
+
 ## setup
 ```
 git clone --recurse-submodules https://github.com/mororo18/outbit.git
