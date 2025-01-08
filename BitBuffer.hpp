@@ -19,9 +19,9 @@ namespace outbit {
     using u8 = uint8_t;
     using s8 = int8_t;
 
-    class Encoder {
+    class BitBuffer {
         public:
-            Encoder() = default;
+            BitBuffer() = default;
             void read_from_file(const fs::path& filepath, std::source_location = std::source_location::current());
 
             template<typename T>
@@ -52,11 +52,11 @@ namespace outbit {
             std::size_t m_unread_bits_of_head_byte = 0;
     };
 
-    const std::vector<u8>& Encoder::buffer() {
+    const std::vector<u8>& BitBuffer::buffer() {
         return m_buffer;
     }
 
-    std::optional<u8> Encoder::tail_byte() {
+    std::optional<u8> BitBuffer::tail_byte() {
         if (!m_buffer.empty()) {
             return std::optional<u8>{m_buffer.back()};
         } 
@@ -65,7 +65,7 @@ namespace outbit {
     }
 
     template<typename T>
-    std::vector<u8> Encoder::serialize(const T &item) {
+    std::vector<u8> BitBuffer::serialize(const T &item) {
         auto* addr = const_cast<u8*>(reinterpret_cast<const u8*>(&item));
         auto item_bytes = sizeof(T);
 
@@ -78,7 +78,7 @@ namespace outbit {
     }
 
     template<typename T>
-    T Encoder::read_bits_as(std::size_t n_bits) {
+    T BitBuffer::read_bits_as(std::size_t n_bits) {
         const std::size_t item_bits_lenght = sizeof(T) * BYTE_BITS;
         assert(n_bits <= item_bits_lenght);
 
@@ -90,7 +90,7 @@ namespace outbit {
 
         auto head_read_bits = BYTE_BITS - m_unread_bits_of_head_byte;
         assert(std::size_t(head_read_bits) < 8); // just checking
-        const auto n_bytes = Encoder::from_bits_to_bytes_length(n_bits + head_read_bits);
+        const auto n_bytes = BitBuffer::from_bits_to_bytes_length(n_bits + head_read_bits);
 
         assert(m_buffer_slice.data() >= m_buffer.data());
         auto item_slice = m_buffer_slice.subspan(0, n_bytes);
@@ -123,18 +123,18 @@ namespace outbit {
         auto all_one_bits = std::bitset<item_bits_lenght + BYTE_BITS * std::size_t(2)>{0}.flip();
         auto valid_bits = (all_one_bits << n_bits).flip();
         auto read_bits = item_bits & valid_bits;
-        auto output = Encoder::serialize(read_bits.to_ullong());
+        auto output = BitBuffer::serialize(read_bits.to_ullong());
 
         return *reinterpret_cast<T*>(output.data());
     }
 
     template<typename T>
-    void Encoder::write(const T &item) {
+    void BitBuffer::write(const T &item) {
         this->write_bits(item, sizeof(T) * BYTE_BITS);
     }
 
     template<typename T>
-    void Encoder::write_bits(const T &item, std::size_t n_bits) {
+    void BitBuffer::write_bits(const T &item, std::size_t n_bits) {
         const std::size_t item_bits_lenght = sizeof(T) * BYTE_BITS;
         assert(n_bits <= item_bits_lenght);
         
@@ -144,7 +144,7 @@ namespace outbit {
         auto item_bits = std::bitset<item_bits_lenght + BYTE_BITS>{};
 
         // Fill 'item_bits'
-        auto serialized = Encoder::serialize(item);
+        auto serialized = BitBuffer::serialize(item);
         for (auto [byte_index, byte] : std::views::enumerate(serialized)) {
              auto byte_bits = std::bitset<BYTE_BITS>{byte};
             for (int bit_index = 0; bit_index < BYTE_BITS; bit_index++) {
@@ -174,7 +174,7 @@ namespace outbit {
         auto all_one_bits = std::bitset<item_bits_lenght + BYTE_BITS>{0}.flip();
         auto output_valid_bits = (all_one_bits << output_valid_bits_lenght).flip();
         auto output_bits = item_bits & output_valid_bits;
-        auto output = Encoder::serialize(output_bits.to_ullong());
+        auto output = BitBuffer::serialize(output_bits.to_ullong());
 
         if (output_valid_bits_lenght % BYTE_BITS) {
             m_used_length_of_tail_byte = output_valid_bits_lenght % BYTE_BITS;
@@ -183,7 +183,7 @@ namespace outbit {
         }
 
         std::size_t output_valid_bytes_lenght =
-            Encoder::from_bits_to_bytes_length(output_valid_bits_lenght);
+            BitBuffer::from_bits_to_bytes_length(output_valid_bits_lenght);
 
         assert(m_used_length_of_tail_byte <= BYTE_BITS);
         assert(output_valid_bytes_lenght <= output.size());
@@ -193,13 +193,13 @@ namespace outbit {
     }
 
     template<typename T>
-    void Encoder::read_from_vector(std::vector<T>& slice) {
+    void BitBuffer::read_from_vector(std::vector<T>& slice) {
         auto span = std::span<T>(slice.data(), slice.size());
         read_from_span(span);
     }
 
     template<typename T>
-    void Encoder::read_from_span(std::span<T> slice) {
+    void BitBuffer::read_from_span(std::span<T> slice) {
         auto slice_as_bytes = std::as_bytes(slice);
         m_buffer = std::vector<u8>();
 

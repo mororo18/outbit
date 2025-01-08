@@ -1,27 +1,24 @@
 #include "utest.h"
-#include "Encoder.hpp"
+#include "BitBuffer.hpp"
 #include <limits>
 
 using namespace outbit;
 
-UTEST(Encoder, roundtrip) {
-    auto enc = Encoder();
-    enc.write_as_file("eita");
-
+UTEST(BitBuffer, roundtrip) {
     // rm warnings
     ASSERT_TRUE(true);
 }
 
-UTEST(Encoder, from_bits_to_bytes_lentgh) {
-    ASSERT_EQ(size_t(0), Encoder::from_bits_to_bytes_length(0));
-    ASSERT_EQ(size_t(1), Encoder::from_bits_to_bytes_length(1));
-    ASSERT_EQ(size_t(1), Encoder::from_bits_to_bytes_length(7));
-    ASSERT_EQ(size_t(1), Encoder::from_bits_to_bytes_length(8));
-    ASSERT_EQ(size_t(2), Encoder::from_bits_to_bytes_length(9));
-    ASSERT_EQ(size_t(9), Encoder::from_bits_to_bytes_length(65));
+UTEST(BitBuffer, from_bits_to_bytes_lentgh) {
+    ASSERT_EQ(size_t(0), BitBuffer::from_bits_to_bytes_length(0));
+    ASSERT_EQ(size_t(1), BitBuffer::from_bits_to_bytes_length(1));
+    ASSERT_EQ(size_t(1), BitBuffer::from_bits_to_bytes_length(7));
+    ASSERT_EQ(size_t(1), BitBuffer::from_bits_to_bytes_length(8));
+    ASSERT_EQ(size_t(2), BitBuffer::from_bits_to_bytes_length(9));
+    ASSERT_EQ(size_t(9), BitBuffer::from_bits_to_bytes_length(65));
 }
 
-UTEST(Encoder, read_bits_as) {
+UTEST(BitBuffer, read_bits_as) {
     typedef struct bytes {
         u8 a;
         u8 b;
@@ -29,30 +26,30 @@ UTEST(Encoder, read_bits_as) {
     } Bytes;
 
     auto data = std::vector<u8> {64, 1, 128, 1};
-    auto enc = Encoder();
-    enc.read_from_vector(data);
+    auto bitbuff = BitBuffer();
+    bitbuff.read_from_vector(data);
 
-    auto first_struct = enc.read_bits_as<Bytes>(8);
+    auto first_struct = bitbuff.read_bits_as<Bytes>(8);
     ASSERT_EQ(first_struct.a, 64);
     ASSERT_EQ(first_struct.b, 0);
     ASSERT_EQ(first_struct.c, 0);
 
-    auto second_struct = enc.read_bits_as<Bytes>(1);
+    auto second_struct = bitbuff.read_bits_as<Bytes>(1);
     ASSERT_EQ(second_struct.a, 1);
     ASSERT_EQ(second_struct.b, 0);
     ASSERT_EQ(second_struct.c, 0);
 
-    auto third_struct = enc.read_bits_as<Bytes>(1);
+    auto third_struct = bitbuff.read_bits_as<Bytes>(1);
     ASSERT_EQ(third_struct.a, 0);
 
-    auto fourth_struct = enc.read_bits_as<Bytes>(6);
+    auto fourth_struct = bitbuff.read_bits_as<Bytes>(6);
     ASSERT_EQ(fourth_struct.a, 0);
 
-    auto fifth_ret = enc.read_bits_as<int>(9);
+    auto fifth_ret = bitbuff.read_bits_as<int>(9);
     ASSERT_EQ(fifth_ret, 0b110000000);
 }
 
-UTEST(Encoder, write) {
+UTEST(BitBuffer, write) {
     typedef struct bytes {
         u8 a;
         u8 b;
@@ -61,18 +58,18 @@ UTEST(Encoder, write) {
 
     Bytes bytes = { 255, 255, 255 };
 
-    auto enc = Encoder();
-    enc.write_bits(bytes, 10);
-    ASSERT_EQ(enc.tail_byte().value(), 3);
+    auto bitbuff = BitBuffer();
+    bitbuff.write_bits(bytes, 10);
+    ASSERT_EQ(bitbuff.tail_byte().value(), 3);
 
-    auto before_write = enc.buffer().size();
-    enc.write(bytes);
-    auto after_write = enc.buffer().size();
-    ASSERT_EQ(enc.tail_byte().value(), 3);
+    auto before_write = bitbuff.buffer().size();
+    bitbuff.write(bytes);
+    auto after_write = bitbuff.buffer().size();
+    ASSERT_EQ(bitbuff.tail_byte().value(), 3);
     ASSERT_EQ(before_write + sizeof(bytes), after_write);
 }
 
-UTEST(Encoder, write_bits) {
+UTEST(BitBuffer, write_bits) {
     typedef struct bytes {
         u8 a;
         u8 b;
@@ -81,43 +78,43 @@ UTEST(Encoder, write_bits) {
 
     Bytes bytes = { 255, 255, 255 };
 
-    auto enc = Encoder();
-    enc.write_bits(bytes, 8);
-    ASSERT_EQ(enc.tail_byte().value(), 255);
+    auto bitbuff = BitBuffer();
+    bitbuff.write_bits(bytes, 8);
+    ASSERT_EQ(bitbuff.tail_byte().value(), 255);
 
-    enc.write_bits(bytes, 9);
-    ASSERT_EQ(enc.tail_byte().value(), 1);
+    bitbuff.write_bits(bytes, 9);
+    ASSERT_EQ(bitbuff.tail_byte().value(), 1);
 
-    enc.write_bits(bytes, 9);
-    ASSERT_EQ(enc.tail_byte().value(), 3);
+    bitbuff.write_bits(bytes, 9);
+    ASSERT_EQ(bitbuff.tail_byte().value(), 3);
 
-    enc.write_bits(bytes, 8);
-    ASSERT_EQ(enc.tail_byte().value(), 3);
+    bitbuff.write_bits(bytes, 8);
+    ASSERT_EQ(bitbuff.tail_byte().value(), 3);
 
-    enc.write_bits(0b111111, 6);
-    ASSERT_EQ(enc.tail_byte().value(), 255);
+    bitbuff.write_bits(0b111111, 6);
+    ASSERT_EQ(bitbuff.tail_byte().value(), 255);
 
 
     /*
-    std::println("buffer size {}", enc.buffer().size());
+    std::println("buffer size {}", bitbuff.buffer().size());
     std::println("buffer as bits:");
-    for (auto byte: enc.buffer()) {
+    for (auto byte: bitbuff.buffer()) {
         std::println("{}", std::bitset<8>{byte}.to_string());
     }
     */
 }
 
-UTEST(Encoder, const_buffer) {
-    auto enc = Encoder();
-    auto size_before = enc.buffer().size();
-    auto buffer = enc.buffer();
+UTEST(BitBuffer, const_buffer) {
+    auto bitbuff = BitBuffer();
+    auto size_before = bitbuff.buffer().size();
+    auto buffer = bitbuff.buffer();
     buffer.push_back(1);
-    auto size_after = enc.buffer().size();
+    auto size_after = bitbuff.buffer().size();
 
     ASSERT_EQ(size_before, size_after);
 }
 
-UTEST(Encoder, serialize_bytes) {
+UTEST(BitBuffer, serialize_bytes) {
     typedef struct bytes {
         u8 a;
         u8 b;
@@ -126,14 +123,14 @@ UTEST(Encoder, serialize_bytes) {
 
     Bytes bytes = { 10, 1, 127 };
 
-    auto serialized_bytes = Encoder::serialize(bytes);
+    auto serialized_bytes = BitBuffer::serialize(bytes);
 
     ASSERT_EQ(serialized_bytes.at(0), 10);
     ASSERT_EQ(serialized_bytes.at(1), 1);
     ASSERT_EQ(serialized_bytes.at(2), 127);
 }
 
-UTEST(Encoder, serialize_integers) {
+UTEST(BitBuffer, serialize_integers) {
 
     typedef struct integers {
         int32_t a;
@@ -147,7 +144,7 @@ UTEST(Encoder, serialize_integers) {
         std::numeric_limits<uint32_t>::max(),
     };
 
-    auto serialized_integers = Encoder::serialize(integers);
+    auto serialized_integers = BitBuffer::serialize(integers);
 
     ASSERT_EQ(serialized_integers.size(), sizeof(Integers));
 

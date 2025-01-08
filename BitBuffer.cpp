@@ -1,4 +1,4 @@
-#include "Encoder.hpp"
+#include "BitBuffer.hpp"
 #include <filesystem>
 #include <fstream>
 #include <stdexcept>
@@ -8,7 +8,7 @@
 namespace outbit {
     namespace fs = std::filesystem;
 
-    void Encoder::write_as_file(const fs::path& filepath, const std::source_location caller_location) {
+    void BitBuffer::write_as_file(const fs::path& filepath, const std::source_location caller_location) {
         auto options = std::fstream::out | std::fstream::trunc| std::fstream::binary;
         auto output_file = std::fstream(filepath, options);
 
@@ -29,7 +29,7 @@ namespace outbit {
         output_file.close();
     }
 
-    void Encoder::read_from_file(const fs::path& filepath, const std::source_location caller_location) {
+    void BitBuffer::read_from_file(const fs::path& filepath, const std::source_location caller_location) {
         auto input_stream = std::ifstream(filepath, std::fstream::binary);
 
         if (!fs::is_regular_file(filepath)) {
@@ -57,7 +57,7 @@ namespace outbit {
         }
     }
 
-    std::size_t Encoder::from_bits_to_bytes_length(std::size_t bits_length) {
+    std::size_t BitBuffer::from_bits_to_bytes_length(std::size_t bits_length) {
         std::size_t bytes_length;
 
         if (bits_length % BYTE_BITS) {

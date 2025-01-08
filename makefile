@@ -1,8 +1,8 @@
 CXXFLAGS = -Wall -Wextra -pedantic -std=c++2b -g
-OBJ = Encoder.o
+OBJ = BitBuffer.o
 TEST_DIR = test/
 
-$(OBJ): Encoder.cpp Encoder.hpp
+$(OBJ): BitBuffer.cpp BitBuffer.hpp
 	$(CXX) $(CXXFLAGS) -c $< -o $(OBJ)
 
 all: $(OBJ) test
