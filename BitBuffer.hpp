@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cstring>
 #include <cassert>
 #include <vector>
 #include <bitset>
@@ -30,8 +31,8 @@ namespace outbit {
             void read_from_vector(std::vector<T>& slice);
 
             void write_as_file(const fs::path&, std::source_location = std::source_location::current());
-            template<typename T> static
-            std::vector<u8> serialize(const T& item);
+            template<typename T, std::size_t N = sizeof(T)> static
+            std::array<u8, N> serialize(const T& item);
 
             template<typename T>
             T read_as();
@@ -66,16 +67,13 @@ namespace outbit {
         return std::nullopt;
     }
 
-    template<typename T>
-    std::vector<u8> BitBuffer::serialize(const T &item) {
+    template<typename T, std::size_t N>
+    std::array<u8, N> BitBuffer::serialize(const T &item) {
         auto* addr = const_cast<u8*>(reinterpret_cast<const u8*>(&item));
         auto item_bytes = sizeof(T);
 
-        // FIXME: We need to substitute this dinamic allocation if possible.
-        // Maybe substitute for some type with max sizeof(unsigned long long), 
-        // probably a std::array<u8>.
-        auto serialized = std::vector<u8>();
-        serialized.assign(addr, addr + item_bytes);
+        auto serialized = std::array<u8, N>();
+        std::memcpy(serialized.data(), addr, item_bytes);
         return serialized;
     }
 
