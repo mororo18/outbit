@@ -1,12 +1,58 @@
-#include "utest.h"
-#include "BitBuffer.hpp"
 #include <limits>
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <utest.h>
+#include <BitBuffer.hpp>
 
 using namespace outbit;
 
 UTEST(BitBuffer, roundtrip) {
-    // rm warnings
-    ASSERT_TRUE(true);
+    std::ifstream file("bit_value_pairs.txt");
+    
+    ASSERT_TRUE(file.is_open());
+
+    size_t bit_count, value;
+    struct bit_value_pair {
+        size_t bit_count, value;
+    };
+
+    std::vector<struct bit_value_pair> bit_value_pairs;
+    while (file >> bit_count >> value) {
+        bit_value_pairs.push_back({bit_count, value});
+    }
+
+    file.close();
+
+    auto bit_writer = BitBuffer();
+    for (auto [bit_count, value] : bit_value_pairs) {
+        bit_writer.write_bits(value, bit_count);
+    }
+
+    auto writer_output = std::vector<u8>(bit_writer.buffer());
+
+    auto bit_reader = BitBuffer();
+    auto new_bit_writer = BitBuffer();
+    bit_reader.read_from_vector(writer_output);
+    for (auto [bit_count, _] : bit_value_pairs) {
+        auto value = bit_reader.read_bits_as<size_t>(bit_count);
+        new_bit_writer.write_bits(value, bit_count);
+    }
+
+    auto bit_writer_buffer = bit_writer.buffer();
+    auto new_bit_writer_buffer = new_bit_writer.buffer();
+
+    ASSERT_EQ(bit_writer_buffer.size(), new_bit_writer_buffer.size());
+
+    auto byte = bit_writer_buffer.begin();
+    auto byte_end = bit_writer_buffer.end();
+
+    auto round_byte = new_bit_writer_buffer.begin();
+    auto round_byte_end = new_bit_writer_buffer.end();
+
+    while (byte != byte_end && round_byte != round_byte_end) {
+        ASSERT_EQ(*byte++, *round_byte++);
+    }
 }
 
 UTEST(BitBuffer, from_bits_to_bytes_lentgh) {
@@ -93,15 +139,6 @@ UTEST(BitBuffer, write_bits) {
 
     bitbuff.write_bits(0b111111, 6);
     ASSERT_EQ(bitbuff.tail_byte().value(), 255);
-
-
-    /*
-    std::println("buffer size {}", bitbuff.buffer().size());
-    std::println("buffer as bits:");
-    for (auto byte: bitbuff.buffer()) {
-        std::println("{}", std::bitset<8>{byte}.to_string());
-    }
-    */
 }
 
 UTEST(BitBuffer, const_buffer) {

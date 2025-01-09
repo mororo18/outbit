@@ -1,4 +1,4 @@
-CXXFLAGS = -Wall -Wextra -pedantic -std=c++2b -I ../external/utest.h -I ../ -g
+CXXFLAGS = -O3 -Wall -Wextra -pedantic -std=c++2b -I ../external/utest.h -I ../ -g
 HXX = ../BitBuffer.hpp
 OBJ = ../BitBuffer.o
 INC_SRC = ../BitBuffer.cpp

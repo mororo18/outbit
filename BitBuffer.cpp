@@ -4,7 +4,6 @@
 #include <stdexcept>
 #include <source_location>
 
-
 namespace outbit {
     namespace fs = std::filesystem;
 
@@ -25,7 +24,11 @@ namespace outbit {
             throw std::runtime_error(erro_msg);
         }
 
-        output_file.write(reinterpret_cast<const char*>(m_buffer.data()), m_buffer.size());
+        output_file.write(
+            reinterpret_cast<const char*>(m_buffer.data()), 
+            std::streamsize(m_buffer.size())
+        );
+
         output_file.close();
     }
 
@@ -69,5 +72,4 @@ namespace outbit {
 
         return bytes_length;
     }
-
 }
