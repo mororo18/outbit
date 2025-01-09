@@ -31,7 +31,7 @@ Read arbitrary bit lengths in sequence:
 ```cpp
 // Create an empty buffer
 auto bitbuffer = outbit::BitBuffer();
-// Store a file in the internal buffer
+// Load a file into the internal buffer
 bitbuffer.read_from_file("custom.file");
 
 struct file_header {
@@ -61,7 +61,7 @@ struct file_header {
 
 struct file_header header = { 11, 121 }; 
 
-// Write the struct in the buffer as raw bytes
+// Write the struct to the buffer as raw bytes
 bitbuffer.write(header);
 
 uint32_t first_value = 1324;
@@ -72,6 +72,6 @@ bitbuffer.write_bits(first_value, 11);
 // Write the first 5 bits of 'second_value' in the buffer
 bitbuffer.write_bits(second_value, 5);
 
-// Write the buffer as a file
+// Save the buffer to a file
 bitbuffer.write_as_file("custom.file");
 ```
