@@ -34,6 +34,8 @@ namespace outbit {
             std::vector<u8> serialize(const T& item);
 
             template<typename T>
+            T read_as();
+            template<typename T>
             T read_bits_as(std::size_t n_bits);
 
             template<typename T>
@@ -75,6 +77,11 @@ namespace outbit {
         auto serialized = std::vector<u8>();
         serialized.assign(addr, addr + item_bytes);
         return serialized;
+    }
+
+    template<typename T>
+    T BitBuffer::read_as() {
+        this->read_bits_as<T>(sizeof(T) * BYTE_BITS);
     }
 
     template<typename T>
