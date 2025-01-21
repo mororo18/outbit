@@ -89,6 +89,10 @@ namespace outbit {
 
         // FIXME: check if its necessary to use these additional 16 bits.
         auto item_bits = std::bitset<item_bits_lenght + BYTE_BITS * std::size_t(2)>();
+        assert(item_bits_lenght + BYTE_BITS
+                <= std::numeric_limits<unsigned long long>::digits
+                && "Item is bigger than 112 bits."
+                );
 
         // The current head byte must always have unread bits
         assert(m_unread_bits_of_head_byte > 0);
@@ -147,6 +151,10 @@ namespace outbit {
         // and place the tail byte used bits at the beggining of the
         // bitset if necessary.
         auto item_bits = std::bitset<item_bits_lenght + BYTE_BITS>{};
+        assert(item_bits_lenght + BYTE_BITS
+                <= std::numeric_limits<unsigned long long>::digits
+                && "Item is bigger than 120 bits."
+                );
 
         // Fill 'item_bits'
         auto serialized = BitBuffer::serialize(item);

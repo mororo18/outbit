@@ -19,6 +19,16 @@ git submodule update --init --recursive
 make
 ```
 
+## build and clean as dependency
+
+```
+# build BitBuffer.o and move to specified path
+make -C path/to/outbit M=path/to/output/object/file lib
+
+# clean BitBuffer.o from specified path
+make -C path/to/outbit M=path/to/output/object/file clean-lib
+```
+
 ## build and run tests
 
 ```
