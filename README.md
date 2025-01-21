@@ -44,13 +44,8 @@ auto bitbuffer = outbit::BitBuffer();
 // Load a file into the internal buffer
 bitbuffer.read_from_file("custom.file");
 
-struct file_header {
-    uint32_t a;
-    uint64_t b;
-};
-
-// Read the first bytes as a struct
-auto header = bitbuffer.read_as<struct file_header>();
+// Read the first bytes as a integer
+auto var = bitbuffer.read_as<int64_t>();
 
 // Read the next 11 bits as an int
 auto first = bitbuffer.read_bits_as<int>(11);
@@ -64,15 +59,10 @@ Write arbitrary bit lengths in sequence:
 // Create an empty buffer
 auto bitbuffer = outbit::BitBuffer();
 
-struct file_header {
-    uint32_t a;
-    uint64_t b;
-};
+int64_t var = -42;
 
-struct file_header header = { 11, 121 }; 
-
-// Write the struct to the buffer as raw bytes
-bitbuffer.write(header);
+// Write integer to the buffer as raw bytes
+bitbuffer.write(var);
 
 uint32_t first_value = 1324;
 char second_value = '@';
