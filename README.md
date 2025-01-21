@@ -45,7 +45,7 @@ auto bitbuffer = outbit::BitBuffer();
 bitbuffer.read_from_file("custom.file");
 
 // Read the first bytes as a integer
-auto var = bitbuffer.read_as<int64_t>();
+auto var = bitbuffer.read_as<int32_t>();
 
 // Read the next 11 bits as an int
 auto first = bitbuffer.read_bits_as<int>(11);
@@ -59,7 +59,7 @@ Write arbitrary bit lengths in sequence:
 // Create an empty buffer
 auto bitbuffer = outbit::BitBuffer();
 
-int64_t var = -42;
+int32_t var = -42;
 
 // Write integer to the buffer as raw bytes
 bitbuffer.write(var);

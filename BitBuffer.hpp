@@ -89,9 +89,9 @@ namespace outbit {
 
         // FIXME: check if its necessary to use these additional 16 bits.
         auto item_bits = std::bitset<item_bits_lenght + BYTE_BITS * std::size_t(2)>();
-        assert(item_bits_lenght + BYTE_BITS
+        assert(item_bits_lenght + BYTE_BITS * std::size_t(2)
                 <= std::numeric_limits<unsigned long long>::digits
-                && "Item is bigger than 112 bits."
+                && "Item is bigger than 48 bits."
                 );
 
         // The current head byte must always have unread bits
@@ -132,6 +132,8 @@ namespace outbit {
         auto all_one_bits = std::bitset<item_bits_lenght + BYTE_BITS * std::size_t(2)>{0}.flip();
         auto valid_bits = (all_one_bits << n_bits).flip();
         auto read_bits = item_bits & valid_bits;
+        // FIXME: the type 'unsigned long long' has 64 bits, so we need to break the
+        // bitset into pieces of 64 bits.
         auto output = BitBuffer::serialize(read_bits.to_ullong());
 
         return *reinterpret_cast<T*>(output.data());
@@ -153,7 +155,7 @@ namespace outbit {
         auto item_bits = std::bitset<item_bits_lenght + BYTE_BITS>{};
         assert(item_bits_lenght + BYTE_BITS
                 <= std::numeric_limits<unsigned long long>::digits
-                && "Item is bigger than 120 bits."
+                && "Item is bigger than 56 bits."
                 );
 
         // Fill 'item_bits'
@@ -187,6 +189,8 @@ namespace outbit {
         auto all_one_bits = std::bitset<item_bits_lenght + BYTE_BITS>{0}.flip();
         auto output_valid_bits = (all_one_bits << output_valid_bits_lenght).flip();
         auto output_bits = item_bits & output_valid_bits;
+        // FIXME: the type 'unsigned long long' has 64 bits, so we need to break the
+        // bitset into pieces of 64 bits.
         auto output = BitBuffer::serialize(output_bits.to_ullong());
 
         if (output_valid_bits_lenght % BYTE_BITS) {
