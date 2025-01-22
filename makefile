@@ -13,7 +13,7 @@ lib: $(OBJ)
 		"This variable should be set with the path in which the BitBuffer.o should be outputed."; \
 		exit 1; \
 	fi
-	mv $(OBJ) $(M)
+	cp $(OBJ) $(M)
 
 test:
 	make -C $(TEST_DIR)
