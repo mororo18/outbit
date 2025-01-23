@@ -93,6 +93,102 @@ UTEST(BitBuffer, read_bits_as) {
 
     auto fifth_ret = bitbuff.read_bits_as<int>(9);
     ASSERT_EQ(fifth_ret, 0b110000000);
+
+    /*
+    typedef struct integers {
+        int32_t a;
+        uint64_t b;
+        int16_t c;
+    } Integers;
+
+    Integers myints = {
+        .a = -53909,
+        .b = 2326172,
+        .c = 41,
+    };
+
+    bitbuff = BitBuffer();
+    bitbuff.write(myints);
+    auto readed_ints = bitbuff.read_as<Integers>();
+
+    ASSERT_EQ(readed_ints.a, myints.a);
+    ASSERT_EQ(readed_ints.b, myints.b);
+    ASSERT_EQ(readed_ints.c, myints.c);
+    */
+}
+
+// TODO: Add more operations
+UTEST(BitBuffer, alternating_write_and_read_ops) {
+    auto bitbuff = BitBuffer();
+    const int a = 42;
+    bitbuff.write(a);
+
+    ASSERT_EQ(a, bitbuff.read_as<int>());
+
+    typedef struct integers {
+        int32_t a;
+        uint64_t b;
+        int16_t c;
+    } Integers;
+
+    const Integers myints = {
+        .a = -53909,
+        .b = 2326172,
+        .c = 41,
+    };
+
+    bitbuff.write(myints);
+
+    bitbuff.write(a);
+    ASSERT_EQ(a, bitbuff.read_as<int>());
+
+    auto read_ints = bitbuff.read_as<Integers>();
+
+    ASSERT_EQ(read_ints.a, myints.a);
+    ASSERT_EQ(read_ints.b, myints.b);
+    ASSERT_EQ(read_ints.c, myints.c);
+}
+
+// TODO: Add more structs
+UTEST(BitBuffer, write_and_read_of_big_structs) {
+    typedef struct integers {
+        int8_t a;
+        int16_t aa;
+        int32_t aaa;
+        int64_t aaaa;
+
+        uint8_t b;
+        uint16_t bb;
+        uint32_t bbb;
+        uint64_t bbbb;
+
+    } AllIntegers;
+
+    const AllIntegers myints = {
+        .a = -50,
+        .aa = -2372,
+        .aaa = 41,
+        .aaaa = -4342341987,
+
+        .b = 50,
+        .bb = 2372,
+        .bbb = 41,
+        .bbbb = 4342341987,
+    };
+
+    auto bitbuff = BitBuffer();
+    bitbuff.write(myints);
+    auto read = bitbuff.read_as<AllIntegers>();
+
+    ASSERT_EQ(myints.a, read.a);
+    ASSERT_EQ(myints.aa, read.aa);
+    ASSERT_EQ(myints.aaa, read.aaa);
+    ASSERT_EQ(myints.aaaa, read.aaaa);
+
+    ASSERT_EQ(myints.b, read.b);
+    ASSERT_EQ(myints.bb, read.bb);
+    ASSERT_EQ(myints.bbb, read.bbb);
+    ASSERT_EQ(myints.bbbb, read.bbbb);
 }
 
 UTEST(BitBuffer, write) {

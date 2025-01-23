@@ -7,6 +7,29 @@
 namespace outbit {
     namespace fs = std::filesystem;
 
+    IndexedSpan::IndexedSpan(std::size_t offset, std::size_t count)
+        : m_offset(offset), m_count{count}
+    {
+    }
+
+    std::optional<IndexedSpan> IndexedSpan::subspan(std::size_t offset) {
+        // Subspan is outside
+        if (offset > m_count) {
+            return std::nullopt;
+        }
+
+        return subspan(offset, m_count - offset);
+    }
+
+    std::optional<IndexedSpan> IndexedSpan::subspan(std::size_t offset, std::size_t count) {
+        // Subspan is outside
+        if (offset + count > m_count) {
+            return std::nullopt;
+        }
+
+        return IndexedSpan(m_offset + offset, count);
+    }
+
     void BitBuffer::write_as_file(const fs::path& filepath, const std::source_location caller_location) {
         auto options = std::fstream::out | std::fstream::trunc| std::fstream::binary;
         auto output_file = std::fstream(filepath, options);
@@ -53,7 +76,7 @@ namespace outbit {
             std::istreambuf_iterator<char>()
             );
 
-        m_buffer_slice = std::span<const u8>(m_buffer);
+        m_buffer_slice = IndexedSpan(0, m_buffer.size());
 
         if (!m_buffer.empty()) {
             m_unread_bits_of_head_byte = BYTE_BITS;
