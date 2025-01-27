@@ -1,6 +1,6 @@
 # outbit
 
-A simple C++20 library for handling arbitrary bit lengths, ideal for custom encoding and compression.
+A simple C++23 library for handling arbitrary bit lengths, ideal for custom encoding and compression.
 
 ## setup
 ```
